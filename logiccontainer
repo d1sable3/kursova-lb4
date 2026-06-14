@@ -1,0 +1,66 @@
+#pragma once
+#include "LogicFunction.h"
+
+// ==================== СТРУКТУРА ВУЗЛА ====================
+
+struct Element {
+    LogicFunction* item;
+    Element* next;
+};
+
+// ==================== КОНТЕЙНЕР ====================
+
+class LogicContainer {
+private:
+    Element* first;
+
+public:
+    LogicContainer() { first = nullptr; }
+
+    ~LogicContainer() {
+        Element* temp = first;
+        while (temp != nullptr) {
+            Element* next = temp->next;
+            delete temp->item;
+            delete temp;
+            temp = next;
+        }
+    }
+
+    void Add(LogicFunction* p) {
+        Element* node = new Element;
+        node->item = p;
+        node->next = nullptr;
+        if (first == nullptr) { first = node; return; }
+        Element* temp = first;
+        while (temp->next != nullptr) temp = temp->next;
+        temp->next = node;
+    }
+
+    int Count() {
+        int c = 0;
+        for (Element* t = first; t != nullptr; t = t->next) c++;
+        return c;
+    }
+
+    LogicFunction* GetAt(int index) {
+        Element* temp = first;
+        int i = 0;
+        while (temp != nullptr) {
+            if (i == index) return temp->item;
+            temp = temp->next; i++;
+        }
+        return nullptr;
+    }
+
+    bool EvaluateExpression(bool x, bool y) {
+        if (first == nullptr) return false;
+        bool result = true;
+        Element* temp = first;
+        while (temp != nullptr) {
+            result = result && temp->item->Calculation(x, y);
+            temp = temp->next;
+        }
+        return result;
+    }
+};
