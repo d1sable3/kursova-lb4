@@ -1,0 +1,163 @@
+#pragma once
+
+#include "LogicContainer.h"
+
+using namespace System;
+using namespace System::ComponentModel;
+using namespace System::Windows::Forms;
+using namespace System::Drawing;
+
+namespace LogicFunctions {
+
+    public ref class MainForm : public System::Windows::Forms::Form
+    {
+    public:
+        MainForm(void)
+        {
+            InitializeComponent();
+            container = new LogicContainer();
+            container->Add(new And);
+            container->Add(new Or);
+            container->Add(new Xor);
+            container->Add(new Nand);
+        }
+
+    protected:
+        ~MainForm()
+        {
+            if (components) { delete components; }
+            if (container) { delete container; container = nullptr; }
+        }
+
+    private:
+        LogicContainer* container;
+
+        System::Windows::Forms::Label^    labelTitle;
+        System::Windows::Forms::Label^    labelX;
+        System::Windows::Forms::Label^    labelY;
+        System::Windows::Forms::ComboBox^ comboX;
+        System::Windows::Forms::ComboBox^ comboY;
+        System::Windows::Forms::Button^   buttonCalc;
+        System::Windows::Forms::DataGridView^ gridResults;
+        System::Windows::Forms::Label^    labelExpr;
+        System::Windows::Forms::TextBox^  textExprResult;
+        System::ComponentModel::Container^ components;
+
+        void InitializeComponent(void)
+        {
+            this->labelTitle     = gcnew Label();
+            this->labelX         = gcnew Label();
+            this->labelY         = gcnew Label();
+            this->comboX         = gcnew ComboBox();
+            this->comboY         = gcnew ComboBox();
+            this->buttonCalc     = gcnew Button();
+            this->gridResults    = gcnew DataGridView();
+            this->labelExpr      = gcnew Label();
+            this->textExprResult = gcnew TextBox();
+            this->SuspendLayout();
+
+            // labelTitle
+            this->labelTitle->AutoSize = true;
+            this->labelTitle->Font     = gcnew System::Drawing::Font(L"Segoe UI", 12, FontStyle::Bold);
+            this->labelTitle->Location = System::Drawing::Point(20, 15);
+            this->labelTitle->Text     = L"Logic Function Calculator";
+
+            // labelX
+            this->labelX->AutoSize = true;
+            this->labelX->Location = System::Drawing::Point(20, 60);
+            this->labelX->Text     = L"Argument x:";
+
+            // comboX
+            this->comboX->DropDownStyle  = ComboBoxStyle::DropDownList;
+            this->comboX->Location       = System::Drawing::Point(100, 57);
+            this->comboX->Size           = System::Drawing::Size(50, 23);
+            this->comboX->Items->Add(L"0");
+            this->comboX->Items->Add(L"1");
+            this->comboX->SelectedIndex  = 1;
+
+            // labelY
+            this->labelY->AutoSize = true;
+            this->labelY->Location = System::Drawing::Point(180, 60);
+            this->labelY->Text     = L"Argument y:";
+
+            // comboY
+            this->comboY->DropDownStyle  = ComboBoxStyle::DropDownList;
+            this->comboY->Location       = System::Drawing::Point(260, 57);
+            this->comboY->Size           = System::Drawing::Size(50, 23);
+            this->comboY->Items->Add(L"0");
+            this->comboY->Items->Add(L"1");
+            this->comboY->SelectedIndex  = 0;
+
+            // buttonCalc
+            this->buttonCalc->Location = System::Drawing::Point(340, 55);
+            this->buttonCalc->Size     = System::Drawing::Size(120, 28);
+            this->buttonCalc->Text     = L"Calculate";
+            this->buttonCalc->Click   += gcnew System::EventHandler(this, &MainForm::buttonCalc_Click);
+
+            // gridResults
+            this->gridResults->Location              = System::Drawing::Point(20, 100);
+            this->gridResults->Size                  = System::Drawing::Size(440, 160);
+            this->gridResults->AllowUserToAddRows    = false;
+            this->gridResults->AllowUserToDeleteRows = false;
+            this->gridResults->ReadOnly              = true;
+            this->gridResults->RowHeadersVisible     = false;
+            this->gridResults->SelectionMode         = DataGridViewSelectionMode::FullRowSelect;
+            this->gridResults->AutoSizeColumnsMode   = DataGridViewAutoSizeColumnsMode::Fill;
+            this->gridResults->ColumnCount           = 2;
+            this->gridResults->Columns[0]->Name      = L"Function";
+            this->gridResults->Columns[1]->Name      = L"Result";
+
+            // labelExpr
+            this->labelExpr->AutoSize = true;
+            this->labelExpr->Location = System::Drawing::Point(20, 275);
+            this->labelExpr->Text     = L"Expression value (all functions via &):";
+
+            // textExprResult
+            this->textExprResult->Location  = System::Drawing::Point(280, 272);
+            this->textExprResult->Size      = System::Drawing::Size(80, 23);
+            this->textExprResult->ReadOnly  = true;
+            this->textExprResult->TextAlign = HorizontalAlignment::Center;
+            this->textExprResult->Font      = gcnew System::Drawing::Font(L"Segoe UI", 10, FontStyle::Bold);
+
+            // Form
+            this->AutoScaleDimensions = System::Drawing::SizeF(7, 15);
+            this->AutoScaleMode       = System::Windows::Forms::AutoScaleMode::Font;
+            this->ClientSize          = System::Drawing::Size(480, 320);
+            this->Controls->Add(this->labelTitle);
+            this->Controls->Add(this->labelX);
+            this->Controls->Add(this->comboX);
+            this->Controls->Add(this->labelY);
+            this->Controls->Add(this->comboY);
+            this->Controls->Add(this->buttonCalc);
+            this->Controls->Add(this->gridResults);
+            this->Controls->Add(this->labelExpr);
+            this->Controls->Add(this->textExprResult);
+            this->FormBorderStyle = System::Windows::Forms::FormBorderStyle::FixedSingle;
+            this->MaximizeBox     = false;
+            this->StartPosition   = FormStartPosition::CenterScreen;
+            this->Text            = L"Logic Functions - Variant 7";
+            this->components      = gcnew System::ComponentModel::Container();
+            this->ResumeLayout(false);
+            this->PerformLayout();
+        }
+
+        System::Void buttonCalc_Click(System::Object^ sender, System::EventArgs^ e)
+        {
+            bool x = (comboX->SelectedIndex == 1);
+            bool y = (comboY->SelectedIndex == 1);
+
+            gridResults->Rows->Clear();
+
+            for (int i = 0; i < container->Count(); i++)
+            {
+                LogicFunction* f  = container->GetAt(i);
+                String^ name      = gcnew String(f->Name());
+                bool    res       = f->Calculation(x, y);
+                gridResults->Rows->Add(name, res ? L"1" : L"0");
+            }
+
+            bool expr = container->EvaluateExpression(x, y);
+            textExprResult->Text = expr ? L"1" : L"0";
+        }
+    };
+}
