@@ -1,0 +1,37 @@
+#pragma once
+
+// ==================== БАЗОВИЙ КЛАС ====================
+
+class LogicFunction {
+public:
+    LogicFunction() {}
+    virtual bool Calculation(bool x, bool y) = 0;
+    virtual const char* Name() = 0;
+    virtual ~LogicFunction() {}
+};
+
+// ==================== РЕАЛІЗАЦІЇ ====================
+
+class And : public LogicFunction {
+public:
+    bool Calculation(bool x, bool y) override { return x && y; }
+    const char* Name() override { return "AND"; }
+};
+
+class Or : public LogicFunction {
+public:
+    bool Calculation(bool x, bool y) override { return x || y; }
+    const char* Name() override { return "OR"; }
+};
+
+class Xor : public LogicFunction {
+public:
+    bool Calculation(bool x, bool y) override { return x != y; }
+    const char* Name() override { return "XOR"; }
+};
+
+class Nand : public LogicFunction {
+public:
+    bool Calculation(bool x, bool y) override { return !(x && y); }
+    const char* Name() override { return "NAND"; }
+};
